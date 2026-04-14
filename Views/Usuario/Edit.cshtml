@@ -1,0 +1,70 @@
+@model TiendaDeDisfraces.Models.Usuario
+
+@using (Html.BeginForm())
+{
+    @Html.ValidationSummary(true, "", new { style = "color:red;" })
+
+    @Html.HiddenFor(m => m.Id)
+
+    <div>
+        <b>Id</b><br />
+        @Html.TextBoxFor(m => m.Id, new { @readonly = "readonly", style = "background-color:lightgray;" })
+    </div>
+
+    <div>
+        <b>Cédula</b><br />
+        @Html.TextBoxFor(m => m.Cedula)
+        @Html.ValidationMessageFor(m => m.Cedula, "", new { style = "color:red;" })
+    </div>
+
+    <div>
+        <b>Nombre</b><br />
+        @Html.TextBoxFor(m => m.Nombre)
+        @Html.ValidationMessageFor(m => m.Nombre, "", new { style = "color:red;" })
+    </div>
+
+    <div>
+        <b>Correo</b><br />
+        @Html.TextBoxFor(m => m.Correo)
+        @Html.ValidationMessageFor(m => m.Correo, "", new { style = "color:red;" })
+    </div>
+
+    <div>
+        <b>Teléfono</b><br />
+        @Html.TextBoxFor(m => m.Telefono)
+        @Html.ValidationMessageFor(m => m.Telefono, "", new { style = "color:red;" })
+    </div>
+
+    <div>
+        <b>Username</b><br />
+        @Html.TextBoxFor(m => m.Username)
+        @Html.ValidationMessageFor(m => m.Username, "", new { style = "color:red;" })
+    </div>
+
+    <div>
+        <b>Password </b><br />
+        @Html.PasswordFor(m => m.Password)
+    </div>
+
+    <div>
+        <b>Rol</b><br />
+        @Html.DropDownListFor(m => m.Rol, (List<SelectListItem>)ViewBag.Roles)
+    </div>
+
+    <div>
+        <b>Fecha Nacimiento</b><br />
+        @Html.TextBoxFor(m => m.FechaNacimiento, "{0:yyyy-MM-dd}", new { type = "date" })
+    </div>
+
+    @if (Model != null && Model.Rol == "Cliente")
+    {
+        <div>
+            <b>⭐ Cliente Preferencial</b>
+            @Html.CheckBoxFor(m => m.Preferencial)
+        </div>
+    }
+
+    <p><input type="submit" value="Save" /></p>
+}
+
+<p>@Html.ActionLink("Back to List", "Index")</p>

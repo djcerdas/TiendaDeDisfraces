@@ -1,0 +1,58 @@
+@model TiendaDeDisfraces.Models.Producto
+
+@using (Html.BeginForm())
+{
+    <div>
+        <b>Nombre</b><br />
+        @Html.EditorFor(m => m.Nombre)
+    </div>
+
+    <div>
+        <b>Precio</b><br />
+        @Html.EditorFor(m => m.Precio)
+    </div>
+
+    <div>
+        <b>Descripcion</b><br />
+        @Html.EditorFor(m => m.Descripcion)
+    </div>
+
+    <div>
+        <b>Tipo de Producto</b><br />
+        @Html.DropDownListFor(m => m.TipoProductoId, (List<SelectListItem>)ViewBag.TiposProducto)
+    </div>
+
+    <div>
+        <b>Público</b><br />
+        @Html.DropDownListFor(m => m.TipoPublicoId, (List<SelectListItem>)ViewBag.TiposPublico)
+    </div>
+
+    <div id="tallaDiv">
+        <b>Talla</b><br />
+        @Html.EditorFor(m => m.Talla)
+    </div>
+
+    <p>
+        <input type="submit" value="Create" />
+    </p>
+}
+
+<p>
+    @Html.ActionLink("Back to List", "Index")
+</p>
+
+<script>
+    function toggleTalla() {
+        var tipo = document.getElementById("TipoProductoId").value;
+        var tallaDiv = document.getElementById("tallaDiv");
+
+        if (tipo == "1") {
+            tallaDiv.style.display = "block";
+        } else {
+            tallaDiv.style.display = "none";
+        }
+    }
+
+    document.getElementById("TipoProductoId").addEventListener("change", toggleTalla);
+    window.onload = toggleTalla;
+</script>

@@ -1,0 +1,41 @@
+@model IEnumerable<TiendaDeDisfraces.Models.Usuario>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+
+<table border="1">
+    <tr>
+        <th>Id</th>
+        <th>Cédula</th>
+        <th>Preferencial</th>
+        <th>Nombre</th>
+        <th>Teléfono</th>
+        <th>Correo</th>
+        <th>Rol</th>
+        <th>Username</th>
+        <th>Edad</th>
+        <th>Tipo</th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Id</td>
+            <td>@item.Cedula</td>
+            <td>@(item.Preferencial ? "⭐" : "")</td>
+            <td>@item.Nombre</td>
+            <td>@item.Telefono</td>
+            <td>@item.Correo</td>
+            <td>@item.Rol</td>
+            <td>@item.Username</td>
+            <td>@item.Edad</td>
+            <td>@item.TipoPublico</td>
+            <td>
+                @Html.ActionLink("Actualizar", "Edit", new { id = item.Id }) |
+                @Html.ActionLink("Eliminar", "Delete", new { id = item.Id })
+            </td>
+        </tr>
+    }
+</table>

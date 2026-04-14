@@ -1,0 +1,122 @@
+@model TiendaDeDisfraces.Models.Usuario
+
+@using (Html.BeginForm())
+{
+    @Html.ValidationSummary(true, "", new { style = "color:red;" })
+
+    <div>
+        <b>Cédula</b><br />
+        @Html.TextBoxFor(m => m.Cedula, new { id = "Cedula" })
+        <span id="cedulaError" style="color:red;"></span><br />
+        @Html.ValidationMessageFor(m => m.Cedula, "", new { style = "color:red;" })
+    </div>
+
+    <div>
+        <b>Nombre</b><br />
+        @Html.TextBoxFor(m => m.Nombre, new { id = "Nombre" })
+        <span id="nombreError" style="color:red;"></span><br />
+        @Html.ValidationMessageFor(m => m.Nombre, "", new { style = "color:red;" })
+    </div>
+
+    <div>
+        <b>Correo</b><br />
+        @Html.TextBoxFor(m => m.Correo, new { id = "Correo" })
+        <span id="correoError" style="color:red;"></span><br />
+        @Html.ValidationMessageFor(m => m.Correo, "", new { style = "color:red;" })
+    </div>
+
+    <div>
+        <b>Teléfono</b><br />
+        @Html.TextBoxFor(m => m.Telefono, new { id = "Telefono" })
+        <span id="telefonoError" style="color:red;"></span><br />
+        @Html.ValidationMessageFor(m => m.Telefono, "", new { style = "color:red;" })
+    </div>
+
+    <div>
+        <b>Username</b><br />
+        @Html.TextBoxFor(m => m.Username)
+        @Html.ValidationMessageFor(m => m.Username, "", new { style = "color:red;" })
+    </div>
+
+    <div>
+        <b>Password</b><br />
+        @Html.PasswordFor(m => m.Password)
+        @Html.ValidationMessageFor(m => m.Password, "", new { style = "color:red;" })
+    </div>
+
+    <div>
+        <b>Rol</b><br />
+        @Html.DropDownListFor(m => m.Rol, (List<SelectListItem>)ViewBag.Roles, new { id = "rol" })
+    </div>
+
+    <div>
+        <b>Fecha</b><br />
+        @Html.TextBoxFor(m => m.FechaNacimiento, "{0:yyyy-MM-dd}", new { type = "date" })
+    </div>
+
+    <div id="prefDiv">
+        <b>⭐ Preferencial</b>
+        @Html.CheckBoxFor(m => m.Preferencial)
+    </div>
+
+    <p>
+        <input type="submit" value="Create" />
+    </p>
+}
+
+<p>@Html.ActionLink("Back to List", "Index")</p>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+    $("#Cedula").on("input", function () {
+    let val = $(this).val();
+    if (!/^\d*$/.test(val)) {
+    $("#cedulaError").text("Solo números");
+    } else {
+    $("#cedulaError").text("");
+    }
+    });
+
+    $("#Nombre").on("input", function () {
+    let val = $(this).val();
+    if (!/^[a-zA-Z\s]*$/.test(val)) {
+    $("#nombreError").text("Solo letras");
+    } else {
+    $("#nombreError").text("");
+    }
+    });
+
+    $("#Correo").on("input", function () {
+    let val = $(this).val();
+    let email = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+    if (!email.test(val)) {
+    $("#correoError").text("Correo inválido");
+    } else {
+    $("#correoError").text("");
+    }
+    });
+
+    $("#Telefono").on("input", function () {
+    let val = $(this).val();
+    if (!/^\d{0,8}$/.test(val)) {
+    $("#telefonoError").text("Máx 8 números");
+    } else {
+    $("#telefonoError").text("");
+    }
+    });
+
+    function togglePref() {
+    if ($("#rol").val() === "Cliente") {
+    $("#prefDiv").show();
+    } else {
+    $("#prefDiv").hide();
+    }
+    }
+
+    $("#rol").change(togglePref);
+    togglePref();
+    });
+</script>

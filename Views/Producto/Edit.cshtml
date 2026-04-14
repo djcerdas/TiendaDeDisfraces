@@ -1,0 +1,31 @@
+@model TiendaDeDisfraces.Models.Producto
+
+<h2>Edit</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.HiddenFor(m => m.Id)
+
+    <div>
+        <b>Nombre</b><br />
+        @Html.EditorFor(m => m.Nombre)
+    </div>
+
+    <div>
+        <b>Precio</b><br />
+        @Html.EditorFor(m => m.Precio)
+    </div>
+
+    <div>
+        <b>Descripcion</b><br />
+        @Html.EditorFor(m => m.Descripcion)
+    </div>
+
+    <p>
+        <input type="submit" value="Save" />
+    </p>
+}
+
+<p>
+    @Html.ActionLink("Back to List", "Index")
+</p>
