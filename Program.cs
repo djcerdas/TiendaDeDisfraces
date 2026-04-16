@@ -15,6 +15,10 @@ builder.Services.AddDbContext<TiendaDeDisfracesContext>(options =>
 
 // MVC
 builder.Services.AddControllersWithViews();
+// Sesión
+builder.Services.AddSession();
+// NECESARIO PARA USAR HttpContext EN VISTAS
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
@@ -26,6 +30,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseStaticFiles();
 app.UseRouting();
+app.UseSession();
 
 // Routing
 app.MapControllerRoute(

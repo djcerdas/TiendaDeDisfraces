@@ -19,15 +19,19 @@ namespace TiendaDeDisfraces.Controllers
         }
 
         #region LOGIN
+        /// <summary>
         /// Muestra la vista de login
+        /// </summary>
         public IActionResult Login()
         {
             return View();
         }
 
+        /// <summary>
         /// Procesa el login del usuario
         /// <param name="usuarioto">Objeto usuario con datos del formulario</param>
         /// <returns>Vista correspondiente</returns>
+        /// <summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Login(Usuario usuarioto)
