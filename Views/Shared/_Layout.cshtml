@@ -7,6 +7,7 @@
 *@
 @{
     var rol = HttpContextAccessor.HttpContext.Session.GetString("Rol");
+    var usuario = HttpContextAccessor.HttpContext.Session.GetString("Usuario");
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -23,7 +24,16 @@
         <div id="header">
             <div class="headtitle">Tienda de Disfraces</div>
         </div>
-
+        <div style="float:right; margin-right:20px;">
+            @if (string.IsNullOrEmpty(usuario))
+            {
+                <a asp-controller="Usuario" asp-action="Login">Login</a>
+            }
+            else
+            {
+                <span>Bienvenido, @usuario</span>
+            }
+        </div>
         <div id="menu">
             <ul>
                 <li>
