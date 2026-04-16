@@ -5,22 +5,62 @@ using System.Collections.Generic;
 using System.Linq;
 using TiendaDeDisfraces.Models;
 using TiendaDeDisfraces.Helpers;
+using Microsoft.AspNetCore.Http;
 
 namespace TiendaDeDisfraces.Controllers
 {
     public class UsuarioController : Controller
     {
-        private readonly TiendaDeDisfracesContext _c;
+        private readonly TiendaDeDisfracesContext _context;
 
-        public UsuarioController(TiendaDeDisfracesContext c)
+        public UsuarioController(TiendaDeDisfracesContext context)
         {
-            _c = c;
+            _context = context;
         }
+
+        #region LOGIN
+        /// Muestra la vista de login
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        /// Procesa el login del usuario
+        /// <param name="usuarioto">Objeto usuario con datos del formulario</param>
+        /// <returns>Vista correspondiente</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Login(Usuario usuarioto)
+        {
+            try
+            {
+                Service service = new Service(_context);
+
+                var usuarioLogin = service.Login(usuarioto.Username, usuarioto.Password);
+
+                if (usuarioLogin != null)
+                {
+                    // Guardar en sesión
+                    HttpContext.Session.SetString("Usuario", usuarioLogin.Username);
+                    HttpContext.Session.SetString("Rol", usuarioLogin.Rol);
+
+                    return RedirectToAction("Index", "Home");
+                }
+
+                return View();
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+        #endregion
 
         // LIST
         public IActionResult Index()
         {
-            return View(_c.Usuarios.ToList());
+            return View(_context.Usuarios.ToList());
         }
 
         // CREATE GET
@@ -42,8 +82,8 @@ namespace TiendaDeDisfraces.Controllers
 
             u.Password = HashHelper.Hash(u.Password);
 
-            _c.Usuarios.Add(u);
-            _c.SaveChanges();
+            _context.Usuarios.Add(u);
+            _context.SaveChanges();
 
             return RedirectToAction("Index");
         }
@@ -51,7 +91,7 @@ namespace TiendaDeDisfraces.Controllers
         // EDIT GET
         public IActionResult Edit(int id)
         {
-            var u = _c.Usuarios.Find(id);
+            var u = _context.Usuarios.Find(id);
             CargarRoles();
             return View(u);
         }
@@ -66,7 +106,7 @@ namespace TiendaDeDisfraces.Controllers
                 return View(u);
             }
 
-            var original = _c.Usuarios
+            var original = _context.Usuarios
                 .AsNoTracking()
                 .FirstOrDefault(x => x.Id == u.Id);
 
@@ -80,8 +120,8 @@ namespace TiendaDeDisfraces.Controllers
                 u.Password = HashHelper.Hash(u.Password);
             }
 
-            _c.Update(u);
-            _c.SaveChanges();
+            _context.Update(u);
+            _context.SaveChanges();
 
             return RedirectToAction("Index");
         }
@@ -89,16 +129,16 @@ namespace TiendaDeDisfraces.Controllers
         // DELETE GET
         public IActionResult Delete(int id)
         {
-            return View(_c.Usuarios.Find(id));
+            return View(_context.Usuarios.Find(id));
         }
 
         // DELETE POST
         [HttpPost, ActionName("Delete")]
         public IActionResult DeleteConfirmed(int id)
         {
-            var u = _c.Usuarios.Find(id);
-            _c.Usuarios.Remove(u);
-            _c.SaveChanges();
+            var u = _context.Usuarios.Find(id);
+            _context.Usuarios.Remove(u);
+            _context.SaveChanges();
 
             return RedirectToAction("Index");
         }
@@ -115,4 +155,5 @@ namespace TiendaDeDisfraces.Controllers
             };
         }
     }
+
 }
