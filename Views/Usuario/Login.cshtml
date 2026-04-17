@@ -1,0 +1,28 @@
+@model TiendaDeDisfraces.Models.Usuario
+
+<h1>Iniciar Sesión</h1>
+
+@if (TempData["Mensaje"] != null)
+{
+    <p style="color:green; font-weight:bold;">
+        @TempData["Mensaje"]
+    </p>
+}
+
+<form asp-action="Login" method="post">
+    @Html.AntiForgeryToken()
+
+    <p>
+        <label>Usuario</label><br />
+        <input asp-for="Username" />
+    </p>
+
+    <p>
+        <label>Contraseña</label><br />
+        <input asp-for="Password" type="password" />
+    </p>
+
+    <p>
+        <button type="submit">Ingresar</button>
+    </p>
+</form>

@@ -1,89 +1,57 @@
 @using Microsoft.AspNetCore.Http
-@inject IHttpContextAccessor HttpContextAccessor
 
-@*
-    Se obtiene el rol del usuario desde la sesión.
-    Este valor se utiliza para controlar qué opciones del menú se muestran.
-*@
 @{
-    var rol = HttpContextAccessor.HttpContext.Session.GetString("Rol");
-    var usuario = HttpContextAccessor.HttpContext.Session.GetString("Usuario");
+    var usuario = Context.Session.GetString("Usuario");
+    var rol = Context.Session.GetString("Rol");
 }
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - TiendaDeDisfraces</title>
 
-    <link rel="stylesheet" href="~/css/css.css" asp-append-version="true" />
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewData["Title"] - TiendaDeDisfraces</title>
+    <link rel="stylesheet" href="~/css/css.css" />
 </head>
+
 <body>
     <div id="container">
 
         <div id="header">
             <div class="headtitle">Tienda de Disfraces</div>
         </div>
-        <div style="float:right; margin-right:20px;">
-            @if (string.IsNullOrEmpty(usuario))
-            {
-                <a asp-controller="Usuario" asp-action="Login">Login</a>
-            }
-            else
-            {
-                <span>Bienvenido, @usuario</span>
-            }
-        </div>
+
         <div id="menu">
             <ul>
-                <li>
-                    <a asp-controller="Home" asp-action="Index">Home</a>
-                </li>
+                <li><a asp-controller="Home" asp-action="Index">Home</a></li>
 
-                <li>
-                    <a asp-controller="Home" asp-action="Privacy">Privacy</a>
-                </li>
-
-                @* Productos: solo ITAdmin / Supervisor *@
-                @if (rol == "ITAdmin" || rol == "Supervisor")
+                @if (rol == "Cajero" || rol == "ITAdmin" || rol == "Supervisor")
                 {
-                    <li>
-                        <a asp-controller="Producto" asp-action="Index">Productos</a>
-                    </li>
+                    <li><a asp-controller="Carrito" asp-action="Index">Carrito</a></li>
                 }
 
-                @* Usuarios: solo ITAdmin / Supervisor *@
                 @if (rol == "ITAdmin" || rol == "Supervisor")
                 {
-                    <li>
-                        <a asp-controller="Usuario" asp-action="Index">Usuarios</a>
-                    </li>
-                }
-
-                @* Carrito: solo Cajero *@
-                @if (rol == "Cajero")
-                {
-                    <li>
-                        <a asp-controller="Carrito" asp-action="Index">Carrito</a>
-                    </li>
+                    <li><a asp-controller="Producto" asp-action="Index">Productos</a></li>
+                    <li><a asp-controller="Usuario" asp-action="Index">Usuarios</a></li>
                 }
             </ul>
+
+            <div style="float:right;">
+                @if (string.IsNullOrEmpty(usuario))
+                {
+                    <a asp-controller="Usuario" asp-action="Login">Login</a>
+                }
+                else
+                {
+                    <span>@usuario</span>
+                    <a asp-controller="Usuario" asp-action="Logout">Logout</a>
+                }
+            </div>
         </div>
 
         <div id="content">
-            <div id="insidecontent">
-                @RenderBody()
-            </div>
-            <div style="clear: both;"></div>
-        </div>
-
-        <div id="footer">
-            <span>Copyright © 2026 | Todos los derechos reservados</span>
+            @RenderBody()
         </div>
 
     </div>
-
-    @RenderSection("Scripts", required: false)
-
 </body>
 </html>

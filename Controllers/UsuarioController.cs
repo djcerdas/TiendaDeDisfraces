@@ -1,14 +1,17 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
-using TiendaDeDisfraces.Models;
 using TiendaDeDisfraces.Helpers;
-using Microsoft.AspNetCore.Http;
+using TiendaDeDisfraces.Models;
 
 namespace TiendaDeDisfraces.Controllers
 {
+    /// <summary>
+    /// Controlador de usuarios: Login + CRUD
+    /// </summary>
     public class UsuarioController : Controller
     {
         private readonly TiendaDeDisfracesContext _context;
@@ -19,19 +22,29 @@ namespace TiendaDeDisfraces.Controllers
         }
 
         #region LOGIN
-        /// <summary>
-        /// Muestra la vista de login
-        /// </summary>
+
         public IActionResult Login()
         {
+            if (!_context.Usuarios.Any())
+                return RedirectToAction("Index", "Setup");
+
             return View();
         }
 
         /// <summary>
-        /// Procesa el login del usuario
-        /// <param name="usuarioto">Objeto usuario con datos del formulario</param>
-        /// <returns>Vista correspondiente</returns>
-        /// <summary>
+        /// Carga los roles para los DropDownList en las vistas Create y Edit.
+        /// </summary>
+        private void CargarRoles()
+        {
+            ViewBag.Roles = new List<SelectListItem>   // ✔ NOMBRE CORRECTO
+    {
+        new SelectListItem { Value = "Cliente", Text = "Cliente" },
+        new SelectListItem { Value = "Cajero", Text = "Cajero" },
+        new SelectListItem { Value = "ITAdmin", Text = "IT Admin" },
+        new SelectListItem { Value = "Supervisor", Text = "Supervisor" }
+    };
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Login(Usuario usuarioto)
@@ -44,7 +57,6 @@ namespace TiendaDeDisfraces.Controllers
 
                 if (usuarioLogin != null)
                 {
-                    // Guardar en sesión
                     HttpContext.Session.SetString("Usuario", usuarioLogin.Username);
                     HttpContext.Session.SetString("Rol", usuarioLogin.Rol);
 
@@ -59,7 +71,15 @@ namespace TiendaDeDisfraces.Controllers
             }
         }
 
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Index", "Home");
+        }
+
         #endregion
+
+        #region CRUD
 
         // LIST
         public IActionResult Index()
@@ -70,20 +90,34 @@ namespace TiendaDeDisfraces.Controllers
         // CREATE GET
         public IActionResult Create()
         {
-            CargarRoles();
+            CargarRoles(); 
             return View();
         }
 
-        // CREATE POST
+        // EDIT GET
+        public IActionResult Edit(int id)
+        {
+            var usuario = _context.Usuarios.Find(id);
+
+            CargarRoles(); // 🔥 IMPORTANTE
+
+            usuario.Password = "";
+
+            return View(usuario);
+        }
+
+        // EDIT POST
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Create(Usuario u)
         {
             if (!ModelState.IsValid)
             {
-                CargarRoles();
+                CargarRoles(); 
                 return View(u);
             }
 
+            // Se encripta la contraseña antes de guardar
             u.Password = HashHelper.Hash(u.Password);
 
             _context.Usuarios.Add(u);
@@ -92,72 +126,26 @@ namespace TiendaDeDisfraces.Controllers
             return RedirectToAction("Index");
         }
 
-        // EDIT GET
-        public IActionResult Edit(int id)
-        {
-            var u = _context.Usuarios.Find(id);
-            CargarRoles();
-            return View(u);
-        }
-
-        // EDIT POST
-        [HttpPost]
-        public IActionResult Edit(Usuario u)
-        {
-            if (!ModelState.IsValid)
-            {
-                CargarRoles();
-                return View(u);
-            }
-
-            var original = _context.Usuarios
-                .AsNoTracking()
-                .FirstOrDefault(x => x.Id == u.Id);
-
-            // 🔥 PASSWORD OPCIONAL
-            if (string.IsNullOrWhiteSpace(u.Password))
-            {
-                u.Password = original.Password;
-            }
-            else
-            {
-                u.Password = HashHelper.Hash(u.Password);
-            }
-
-            _context.Update(u);
-            _context.SaveChanges();
-
-            return RedirectToAction("Index");
-        }
-
         // DELETE GET
         public IActionResult Delete(int id)
         {
-            return View(_context.Usuarios.Find(id));
+            var usuario = _context.Usuarios.Find(id);
+            return View(usuario);
         }
 
         // DELETE POST
         [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            var u = _context.Usuarios.Find(id);
-            _context.Usuarios.Remove(u);
+            var usuario = _context.Usuarios.Find(id);
+
+            _context.Usuarios.Remove(usuario);
             _context.SaveChanges();
 
             return RedirectToAction("Index");
         }
 
-        // 🔥 ROLES
-        private void CargarRoles()
-        {
-            ViewBag.Roles = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "Cliente", Text = "Cliente" },
-                new SelectListItem { Value = "Cajero", Text = "Cajero" },
-                new SelectListItem { Value = "ITAdmin", Text = "ITAdmin" },
-                new SelectListItem { Value = "Supervisor", Text = "Supervisor" }
-            };
-        }
+        #endregion
     }
-
 }

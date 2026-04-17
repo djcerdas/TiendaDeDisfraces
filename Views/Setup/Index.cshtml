@@ -1,0 +1,79 @@
+﻿@model TiendaDeDisfraces.Models.Usuario
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Configuración Inicial</title>
+    <link rel="stylesheet" href="~/css/css.css" />
+</head>
+
+<body>
+
+    <div id="container">
+
+        <div id="header">
+            <div class="headtitle">Tienda de Disfraces</div>
+        </div>
+
+        <div id="content">
+            <div id="insidecontent">
+
+                <h1>Configuración Inicial</h1>
+
+                <p>
+                    Cree el usuario administrador del sistema.<br />
+                    Complete todos los campos requeridos.
+                </p>
+
+                @Html.ValidationSummary()
+
+                <form asp-action="Index" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <p>
+                        <label>Nombre</label><br />
+                        <input asp-for="Nombre" />
+                    </p>
+
+                    <p>
+                        <label>Cédula</label><br />
+                        <input asp-for="Cedula" />
+                    </p>
+
+                    <p>
+                        <label>Teléfono</label><br />
+                        <input asp-for="Telefono" />
+                    </p>
+
+                    <p>
+                        <label>Correo</label><br />
+                        <input asp-for="Correo" />
+                    </p>
+
+                    <p>
+                        <label>Usuario</label><br />
+                        <input asp-for="Username" />
+                    </p>
+
+                    <p>
+                        <label>Contraseña</label><br />
+                        <input asp-for="Password" type="password" />
+                    </p>
+
+                    <p>
+                        <button type="submit">Crear Administrador</button>
+                    </p>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
