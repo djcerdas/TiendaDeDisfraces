@@ -1,12 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - TiendaDeDisfraces</title>
+@using Microsoft.AspNetCore.Http
 
-    <link rel="stylesheet" href="~/css/css.css" asp-append-version="true" />
+@{
+    var usuario = Context.Session.GetString("Usuario");
+    var rol = Context.Session.GetString("Rol");
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewData["Title"] - TiendaDeDisfraces</title>
+    <link rel="stylesheet" href="~/css/css.css" />
 </head>
+
 <body>
     <div id="container">
 
@@ -16,35 +21,37 @@
 
         <div id="menu">
             <ul>
-                <li>
-                    <a asp-controller="Home" asp-action="Index">Home</a>
-                </li>
-                <li>
-                    <a asp-controller="Home" asp-action="Privacy">Privacy</a>
-                </li>
-                <li>
-                    <a asp-controller="Producto" asp-action="Index">Productos</a>
-                </li>
-                <li>
-                    <a asp-controller="Usuario" asp-action="Index">Usuarios</a>
-                </li>
+                <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+
+                @if (rol == "Cajero" || rol == "ITAdmin" || rol == "Supervisor")
+                {
+                    <li><a asp-controller="Carrito" asp-action="Index">Carrito</a></li>
+                }
+
+                @if (rol == "ITAdmin" || rol == "Supervisor")
+                {
+                    <li><a asp-controller="Producto" asp-action="Index">Productos</a></li>
+                    <li><a asp-controller="Usuario" asp-action="Index">Usuarios</a></li>
+                }
             </ul>
+
+            <div style="float:right;">
+                @if (string.IsNullOrEmpty(usuario))
+                {
+                    <a asp-controller="Usuario" asp-action="Login">Login</a>
+                }
+                else
+                {
+                    <span>@usuario</span>
+                    <a asp-controller="Usuario" asp-action="Logout">Logout</a>
+                }
+            </div>
         </div>
 
         <div id="content">
-            <div id="insidecontent">
-                @RenderBody()
-            </div>
-            <div style="clear: both;"></div>
-        </div>
-
-        <div id="footer">
-            <span>Copyright © 2026 | Todos los derechos reservados</span>
+            @RenderBody()
         </div>
 
     </div>
-
-    @RenderSection("Scripts", required: false)
-
 </body>
 </html>
