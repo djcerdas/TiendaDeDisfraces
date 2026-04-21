@@ -1,31 +1,117 @@
 @model TiendaDeDisfraces.Models.Producto
 
-<h2>Edit</h2>
-
-@using (Html.BeginForm())
-{
-    @Html.HiddenFor(m => m.Id)
-
-    <div>
-        <b>Nombre</b><br />
-        @Html.EditorFor(m => m.Nombre)
-    </div>
-
-    <div>
-        <b>Precio</b><br />
-        @Html.EditorFor(m => m.Precio)
-    </div>
-
-    <div>
-        <b>Descripcion</b><br />
-        @Html.EditorFor(m => m.Descripcion)
-    </div>
-
-    <p>
-        <input type="submit" value="Save" />
-    </p>
+@{
+    ViewData["Title"] = "Edit";
 }
 
-<p>
-    @Html.ActionLink("Back to List", "Index")
-</p>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+
+        <!-- Formulario de edición del producto -->
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+
+            <!-- Id oculto para el POST -->
+            <input type="hidden" asp-for="Id" />
+
+            <!-- Muestra errores generales del modelo -->
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- Id visible pero solo lectura (como en el ejemplo de la profe) -->
+            <div class="form-group">
+                <label asp-for="Id" class="control-label"></label>
+                <input asp-for="Id" class="form-control" readonly style="background-color:lightgray;" />
+                <span asp-validation-for="Id" class="text-danger"></span>
+            </div>
+
+            <!-- Nombre del producto -->
+            <div class="form-group">
+                <label asp-for="Nombre" class="control-label"></label>
+                <input asp-for="Nombre" class="form-control" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+
+            <!-- Precio del producto -->
+            <div class="form-group">
+                <label asp-for="Precio" class="control-label"></label>
+                <input asp-for="Precio" class="form-control" />
+                <span asp-validation-for="Precio" class="text-danger"></span>
+            </div>
+
+            <!-- Descripción del producto -->
+            <div class="form-group">
+                <label asp-for="Descripcion" class="control-label"></label>
+                <input asp-for="Descripcion" class="form-control" />
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
+            </div>
+
+            <!-- Tipo de producto -->
+            <div class="form-group">
+                <label asp-for="TipoProductoId" class="control-label"></label>
+                <select asp-for="TipoProductoId" class="form-control" asp-items="ViewBag.TiposProducto">
+                    <option value="">-- Seleccione un tipo de producto --</option>
+                </select>
+                <span asp-validation-for="TipoProductoId" class="text-danger"></span>
+            </div>
+
+            <!-- Público objetivo -->
+            <div class="form-group">
+                <label asp-for="TipoPublicoId" class="control-label"></label>
+                <select asp-for="TipoPublicoId" class="form-control" asp-items="ViewBag.TiposPublico">
+                    <option value="">-- Seleccione un público --</option>
+                </select>
+                <span asp-validation-for="TipoPublicoId" class="text-danger"></span>
+            </div>
+
+            <!-- Talla: solo aplica cuando el producto es Disfraz -->
+            <div class="form-group" id="tallaDiv">
+                <label asp-for="Talla" class="control-label"></label>
+                <select asp-for="Talla" class="form-control">
+                    <option value="">-- Seleccione una talla --</option>
+                    <option value="XS">XS</option>
+                    <option value="S">S</option>
+                    <option value="M">M</option>
+                    <option value="L">L</option>
+                    <option value="XL">XL</option>
+                </select>
+                <span asp-validation-for="Talla" class="text-danger"></span>
+            </div>
+
+            <!-- Botón guardar -->
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- Regreso al listado -->
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+<script>
+    // Controla si el campo Talla debe mostrarse u ocultarse
+    function toggleTalla() {
+        var tipo = document.getElementById("TipoProductoId").value;
+        var tallaDiv = document.getElementById("tallaDiv");
+        var talla = document.getElementById("Talla");
+
+        if (tipo == "1") {
+            tallaDiv.style.display = "block";
+        } else {
+            tallaDiv.style.display = "none";
+
+            // Limpia talla si no aplica
+            if (talla) {
+                talla.value = "";
+            }
+        }
+    }
+
+    document.getElementById("TipoProductoId").addEventListener("change", toggleTalla);
+    window.onload = toggleTalla;
+</script>
