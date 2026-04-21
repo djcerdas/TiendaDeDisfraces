@@ -160,3 +160,23 @@ h3 {
         padding: 10px;
         color: #767676;
     }
+
+/* Contenedor del producto */
+.producto-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Imagen del producto */
+.producto-img {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+}
+
+/* Botón */
+.btn-agregar {
+    padding: 6px 10px;
+    cursor: pointer;
+}

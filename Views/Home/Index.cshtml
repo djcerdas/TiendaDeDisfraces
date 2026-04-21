@@ -2,8 +2,15 @@
     ViewData["Title"] = "Home";
 }
 
-<div id="insidecontent">
-    <button type="button" onclick="addToCart()">Agregar</button>
+<div class="producto-card">
+    <!-- Imagen del producto -->
+    <img src="~/images/camisa_happy.jpg" alt="Camisa happy" class="producto-img" />
+
+    <!-- Botón -->
+    <button type="button" class="btn-agregar" onclick="addToCart()">
+        Agregar
+    </button>
+
 </div>
 
 @section Scripts {
