@@ -56,7 +56,7 @@
 
     <div id="prefDiv">
         <b>⭐ Preferencial</b>
-        @Html.CheckBoxFor(m => m.Preferencial)
+        @Html.CheckBoxFor(m => m.Preferencial, new { id = "Preferencial" })
     </div>
 
     <p>
@@ -72,21 +72,31 @@
     $(document).ready(function () {
 
     $("#Cedula").on("input", function () {
-    let val = $(this).val();
-    if (!/^\d*$/.test(val)) {
+    let original = $(this).val();
+
+    let clean = original.replace(/\D/g, ""); // remove non-digits
+
+    if (original !== clean) {
     $("#cedulaError").text("Solo números");
     } else {
     $("#cedulaError").text("");
     }
+
+    $(this).val(clean);
     });
 
     $("#Nombre").on("input", function () {
-    let val = $(this).val();
-    if (!/^[a-zA-Z\s]*$/.test(val)) {
+    let original = $(this).val();
+
+    let clean = original.replace(/[^a-zA-Z\s]/g, "");
+
+    if (original !== clean) {
     $("#nombreError").text("Solo letras");
     } else {
     $("#nombreError").text("");
     }
+
+    $(this).val(clean);
     });
 
     $("#Correo").on("input", function () {
@@ -100,12 +110,17 @@
     });
 
     $("#Telefono").on("input", function () {
-    let val = $(this).val();
-    if (!/^\d{0,8}$/.test(val)) {
-    $("#telefonoError").text("Máx 8 números");
+    let original = $(this).val();
+
+    let clean = original.replace(/\D/g, "").slice(0, 8);
+
+    if (original !== clean) {
+    $("#telefonoError").text("Solo números (máx 8)");
     } else {
     $("#telefonoError").text("");
     }
+
+    $(this).val(clean);
     });
 
     function togglePref() {
@@ -113,6 +128,7 @@
     $("#prefDiv").show();
     } else {
     $("#prefDiv").hide();
+    $("#Preferencial").prop("checked", false);
     }
     }
 

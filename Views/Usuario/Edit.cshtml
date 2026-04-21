@@ -2,69 +2,127 @@
 
 @using (Html.BeginForm())
 {
+    @Html.AntiForgeryToken()
+
+    <!-- Muestra errores generales del modelo -->
     @Html.ValidationSummary(true, "", new { style = "color:red;" })
 
+    <!-- Mantiene el Id oculto para que el POST actualice el registro correcto -->
     @Html.HiddenFor(m => m.Id)
 
     <div>
+        <!-- Id visible pero solo lectura, siguiendo el estilo de la profesora -->
         <b>Id</b><br />
         @Html.TextBoxFor(m => m.Id, new { @readonly = "readonly", style = "background-color:lightgray;" })
     </div>
 
     <div>
+        <!-- Cédula del usuario -->
         <b>Cédula</b><br />
-        @Html.TextBoxFor(m => m.Cedula)
+        @Html.TextBoxFor(m => m.Cedula, new { id = "Cedula" })
         @Html.ValidationMessageFor(m => m.Cedula, "", new { style = "color:red;" })
     </div>
 
     <div>
+        <!-- Nombre del usuario -->
         <b>Nombre</b><br />
-        @Html.TextBoxFor(m => m.Nombre)
+        @Html.TextBoxFor(m => m.Nombre, new { id = "Nombre" })
         @Html.ValidationMessageFor(m => m.Nombre, "", new { style = "color:red;" })
     </div>
 
     <div>
+        <!-- Correo electrónico -->
         <b>Correo</b><br />
         @Html.TextBoxFor(m => m.Correo)
         @Html.ValidationMessageFor(m => m.Correo, "", new { style = "color:red;" })
     </div>
 
     <div>
+        <!-- Teléfono -->
         <b>Teléfono</b><br />
-        @Html.TextBoxFor(m => m.Telefono)
+        @Html.TextBoxFor(m => m.Telefono, new { id = "Telefono" })
         @Html.ValidationMessageFor(m => m.Telefono, "", new { style = "color:red;" })
     </div>
 
     <div>
+        <!-- Nombre de usuario para login -->
         <b>Username</b><br />
         @Html.TextBoxFor(m => m.Username)
         @Html.ValidationMessageFor(m => m.Username, "", new { style = "color:red;" })
     </div>
 
     <div>
-        <b>Password </b><br />
+        <!-- Contraseña: si se deja vacía, el controller conserva la actual -->
+        <b>Password</b><br />
         @Html.PasswordFor(m => m.Password)
     </div>
 
     <div>
+        <!-- Rol del usuario -->
         <b>Rol</b><br />
-        @Html.DropDownList("Rol", (List<SelectListItem>)ViewBag.Roles)
+        @Html.DropDownList("Rol", (List<SelectListItem>)ViewBag.Roles, new { id = "rol" })
     </div>
 
     <div>
+        <!-- Fecha de nacimiento -->
         <b>Fecha Nacimiento</b><br />
         @Html.TextBoxFor(m => m.FechaNacimiento, "{0:yyyy-MM-dd}", new { type = "date" })
     </div>
 
-    @if (Model != null && Model.Rol == "Cliente")
-    {
-        <div>
-            <b>⭐ Cliente Preferencial</b>
-            @Html.CheckBoxFor(m => m.Preferencial)
-        </div>
-    }
+    <div id="prefDiv">
+        <!-- Preferencial solo aplica para clientes -->
+        <b>⭐ Cliente Preferencial</b>
+        @Html.CheckBoxFor(m => m.Preferencial, new { id = "Preferencial" })
+    </div>
 
-    <p><input type="submit" value="Save" /></p>
+    <p>
+        <input type="submit" value="Save" />
+    </p>
 }
 
-<p>@Html.ActionLink("Back to List", "Index")</p>
+<p>
+    @Html.ActionLink("Back to List", "Index")
+</p>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+    // Controla si el checkbox Preferencial debe mostrarse según el rol seleccionado
+    function togglePref() {
+    if ($("#rol").val() === "Cliente") {
+    $("#prefDiv").show();
+    } else {
+    $("#prefDiv").hide();
+
+    // Limpia el valor si el rol ya no es Cliente
+    $("#Preferencial").prop("checked", false);
+    }
+    }
+
+    // Cédula: solo números en tiempo real
+    $("#Cedula").on("input", function () {
+    let clean = $(this).val().replace(/\D/g, "");
+    $(this).val(clean);
+    });
+
+    // Nombre: solo letras y espacios en tiempo real
+    $("#Nombre").on("input", function () {
+    let clean = $(this).val().replace(/[^a-zA-Z\s]/g, "");
+    $(this).val(clean);
+    });
+
+    // Teléfono: solo números, máximo 8 dígitos
+    $("#Telefono").on("input", function () {
+    let clean = $(this).val().replace(/\D/g, "").slice(0, 8);
+    $(this).val(clean);
+    });
+
+    // Ejecuta la lógica al cambiar el rol
+    $("#rol").change(togglePref);
+
+    // Ejecuta la lógica al cargar la vista
+    togglePref();
+    });
+</script>
