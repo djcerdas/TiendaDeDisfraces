@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using TiendaDeDisfraces.Helpers;
@@ -10,10 +9,13 @@ using TiendaDeDisfraces.Models;
 namespace TiendaDeDisfraces.Controllers
 {
     /// <summary>
-    /// Controlador de usuarios: Login + CRUD
+    /// Controlador de usuarios:
+    /// - Login / Logout
+    /// - CRUD de usuarios
     /// </summary>
     public class UsuarioController : Controller
     {
+        // Contexto de base de datos
         private readonly TiendaDeDisfracesContext _context;
 
         public UsuarioController(TiendaDeDisfracesContext context)
@@ -23,6 +25,10 @@ namespace TiendaDeDisfraces.Controllers
 
         #region LOGIN
 
+        /// <summary>
+        /// Muestra la vista de login.
+        /// Si no existen usuarios, redirige a la configuración inicial.
+        /// </summary>
         public IActionResult Login()
         {
             if (!_context.Usuarios.Any())
@@ -36,15 +42,19 @@ namespace TiendaDeDisfraces.Controllers
         /// </summary>
         private void CargarRoles()
         {
-            ViewBag.Roles = new List<SelectListItem>   // ✔ NOMBRE CORRECTO
-    {
-        new SelectListItem { Value = "Cliente", Text = "Cliente" },
-        new SelectListItem { Value = "Cajero", Text = "Cajero" },
-        new SelectListItem { Value = "ITAdmin", Text = "IT Admin" },
-        new SelectListItem { Value = "Supervisor", Text = "Supervisor" }
-    };
+            ViewBag.Roles = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "Cliente", Text = "Cliente" },
+                new SelectListItem { Value = "Cajero", Text = "Cajero" },
+                new SelectListItem { Value = "ITAdmin", Text = "IT Admin" },
+                new SelectListItem { Value = "Supervisor", Text = "Supervisor" }
+            };
         }
 
+        /// <summary>
+        /// Procesa el login del usuario.
+        /// Si las credenciales son válidas, guarda usuario y rol en sesión.
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Login(Usuario usuarioto)
@@ -63,14 +73,19 @@ namespace TiendaDeDisfraces.Controllers
                     return RedirectToAction("Index", "Home");
                 }
 
+                ModelState.AddModelError("", "Usuario o contraseña incorrectos");
                 return View();
             }
             catch
             {
+                ModelState.AddModelError("", "Ocurrió un error al iniciar sesión");
                 return View();
             }
         }
 
+        /// <summary>
+        /// Cierra la sesión actual.
+        /// </summary>
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
@@ -81,43 +96,44 @@ namespace TiendaDeDisfraces.Controllers
 
         #region CRUD
 
-        // LIST
+        /// <summary>
+        /// Lista todos los usuarios registrados.
+        /// </summary>
         public IActionResult Index()
         {
             return View(_context.Usuarios.ToList());
         }
 
-        // CREATE GET
+        /// <summary>
+        /// Muestra la vista de creación de usuario.
+        /// </summary>
         public IActionResult Create()
         {
-            CargarRoles(); 
+            CargarRoles();
             return View();
         }
 
-        // EDIT GET
-        public IActionResult Edit(int id)
-        {
-            var usuario = _context.Usuarios.Find(id);
-
-            CargarRoles(); // 🔥 IMPORTANTE
-
-            usuario.Password = "";
-
-            return View(usuario);
-        }
-
-        // EDIT POST
+        /// <summary>
+        /// Guarda un nuevo usuario.
+        /// Aplica validación del modelo y encripta la contraseña.
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Usuario u)
         {
             if (!ModelState.IsValid)
             {
-                CargarRoles(); 
+                CargarRoles();
                 return View(u);
             }
 
-            // Se encripta la contraseña antes de guardar
+            // Solo los clientes pueden quedar como preferenciales
+            if (u.Rol != "Cliente")
+            {
+                u.Preferencial = false;
+            }
+
+            // Encripta la contraseña antes de guardar
             u.Password = HashHelper.Hash(u.Password);
 
             _context.Usuarios.Add(u);
@@ -126,19 +142,99 @@ namespace TiendaDeDisfraces.Controllers
             return RedirectToAction("Index");
         }
 
-        // DELETE GET
-        public IActionResult Delete(int id)
+        /// <summary>
+        /// Muestra la vista de edición de un usuario existente.
+        /// </summary>
+        public IActionResult Edit(int id)
         {
             var usuario = _context.Usuarios.Find(id);
+
+            if (usuario == null)
+            {
+                return NotFound();
+            }
+
+            CargarRoles();
+
+            // Se deja vacío para que el usuario ingrese una nueva contraseña
+            // solo si desea cambiarla.
+            usuario.Password = "";
+
             return View(usuario);
         }
 
-        // DELETE POST
+        /// <summary>
+        /// Actualiza un usuario existente.
+        /// Si no se escribe una nueva contraseña, conserva la actual.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(Usuario u)
+        {
+            if (!ModelState.IsValid)
+            {
+                CargarRoles();
+                return View(u);
+            }
+
+            var usuarioDB = _context.Usuarios.Find(u.Id);
+
+            if (usuarioDB == null)
+            {
+                return NotFound();
+            }
+
+            // Actualización de campos editables
+            usuarioDB.Cedula = u.Cedula;
+            usuarioDB.Nombre = u.Nombre;
+            usuarioDB.Correo = u.Correo;
+            usuarioDB.Telefono = u.Telefono;
+            usuarioDB.Username = u.Username;
+            usuarioDB.Rol = u.Rol;
+            usuarioDB.FechaNacimiento = u.FechaNacimiento;
+
+            // Solo los clientes pueden ser preferenciales
+            usuarioDB.Preferencial = (u.Rol == "Cliente") ? u.Preferencial : false;
+
+            // Solo reemplaza la contraseña si el usuario escribió una nueva
+            if (!string.IsNullOrWhiteSpace(u.Password))
+            {
+                usuarioDB.Password = HashHelper.Hash(u.Password);
+            }
+
+            _context.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
+
+        /// <summary>
+        /// Muestra la vista de confirmación para eliminar un usuario.
+        /// </summary>
+        public IActionResult Delete(int id)
+        {
+            var usuario = _context.Usuarios.Find(id);
+
+            if (usuario == null)
+            {
+                return NotFound();
+            }
+
+            return View(usuario);
+        }
+
+        /// <summary>
+        /// Elimina definitivamente un usuario.
+        /// </summary>
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
             var usuario = _context.Usuarios.Find(id);
+
+            if (usuario == null)
+            {
+                return NotFound();
+            }
 
             _context.Usuarios.Remove(usuario);
             _context.SaveChanges();

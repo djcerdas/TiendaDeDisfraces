@@ -2,57 +2,112 @@
 
 @using (Html.BeginForm())
 {
+    // Muestra errores generales del modelo cuando falla la validación del servidor
+    @Html.ValidationSummary(true, "", new { style = "color:red;" })
+
     <div>
+        <!-- Campo: Nombre del producto -->
         <b>Nombre</b><br />
         @Html.EditorFor(m => m.Nombre)
+        @Html.ValidationMessageFor(m => m.Nombre, "", new { style = "color:red;" })
     </div>
 
     <div>
+        <!-- Campo: Precio del producto -->
         <b>Precio</b><br />
         @Html.EditorFor(m => m.Precio)
+        @Html.ValidationMessageFor(m => m.Precio, "", new { style = "color:red;" })
     </div>
 
     <div>
+        <!-- Campo: Descripción del producto -->
         <b>Descripcion</b><br />
         @Html.EditorFor(m => m.Descripcion)
+        @Html.ValidationMessageFor(m => m.Descripcion, "", new { style = "color:red;" })
     </div>
 
     <div>
+        <!-- Selección del tipo de producto -->
+        <!-- 1 = Disfraz, 2 = Accesorio, 3 = Maquillaje -->
         <b>Tipo de Producto</b><br />
-        @Html.DropDownListFor(m => m.TipoProductoId, (List<SelectListItem>)ViewBag.TiposProducto)
+        @Html.DropDownListFor(
+            m => m.TipoProductoId,
+            (List<SelectListItem>)ViewBag.TiposProducto,
+            "-- Seleccione --"
+        )
+        @Html.ValidationMessageFor(m => m.TipoProductoId, "", new { style = "color:red;" })
     </div>
 
     <div>
+        <!-- Selección del público objetivo -->
+        <!-- 1 = Adulto, 2 = Niño, 3 = Todo Público -->
         <b>Público</b><br />
-        @Html.DropDownListFor(m => m.TipoPublicoId, (List<SelectListItem>)ViewBag.TiposPublico)
+        @Html.DropDownListFor(
+            m => m.TipoPublicoId,
+            (List<SelectListItem>)ViewBag.TiposPublico,
+            "-- Seleccione --"
+        )
+        @Html.ValidationMessageFor(m => m.TipoPublicoId, "", new { style = "color:red;" })
     </div>
 
     <div id="tallaDiv">
+        <!-- La talla solo aplica cuando el tipo de producto es Disfraz -->
         <b>Talla</b><br />
-        @Html.EditorFor(m => m.Talla)
+        @Html.DropDownListFor(
+            m => m.Talla,
+            new List<SelectListItem>
+            {
+                new SelectListItem { Value = "XS", Text = "XS" },
+                new SelectListItem { Value = "S", Text = "S" },
+                new SelectListItem { Value = "M", Text = "M" },
+                new SelectListItem { Value = "L", Text = "L" },
+                new SelectListItem { Value = "XL", Text = "XL" }
+            },
+            "-- Seleccione talla --"
+        )
+        @Html.ValidationMessageFor(m => m.Talla, "", new { style = "color:red;" })
     </div>
 
     <p>
+        <!-- Botón para enviar el formulario -->
         <input type="submit" value="Create" />
     </p>
 }
 
 <p>
+    <!-- Navegación para volver al listado de productos -->
     @Html.ActionLink("Back to List", "Index")
 </p>
 
 <script>
+    // Controla si el campo Talla debe mostrarse o ocultarse
     function toggleTalla() {
+        // Obtiene el valor seleccionado en el tipo de producto
         var tipo = document.getElementById("TipoProductoId").value;
+
+        // Contenedor visual de la talla
         var tallaDiv = document.getElementById("tallaDiv");
 
+        // Dropdown de talla
+        var talla = document.getElementById("Talla");
+
+        // Si el tipo es Disfraz (1), se muestra el campo talla
         if (tipo == "1") {
             tallaDiv.style.display = "block";
         } else {
+            // Si no es disfraz, se oculta la talla
             tallaDiv.style.display = "none";
+
+            // Además, se limpia el valor para evitar enviar una talla innecesaria
+            if (talla) {
+                talla.value = "";
+            }
         }
     }
 
+    // Ejecuta la función cuando cambia el tipo de producto
     document.getElementById("TipoProductoId").addEventListener("change", toggleTalla);
+
+    // Ejecuta la función al cargar la vista para definir el estado inicial
     window.onload = toggleTalla;
 </script>

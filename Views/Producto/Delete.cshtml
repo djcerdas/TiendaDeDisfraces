@@ -1,20 +1,48 @@
 @model TiendaDeDisfraces.Models.Producto
 
-<h2>Delete</h2>
-
-<p>Are you sure you want to delete this?</p>
-
-<div>
-    <b>@Model.Nombre</b>
-</div>
-
-@using (Html.BeginForm())
-{
-    @Html.HiddenFor(m => m.Id)
-
-    <input type="submit" value="Delete" />
+@{
+    ViewData["Title"] = "Delete";
 }
 
-<p>
-    @Html.ActionLink("Back to List", "Index")
-</p>
+<hr />
+
+<div>
+    <!-- Mensaje de confirmación -->
+    <h3>Are you sure you want to delete this?</h3>
+
+    <!-- Detalle del producto a eliminar -->
+    <dl class="row">
+        <dt class="col-sm-2">Id</dt>
+        <dd class="col-sm-10">@Model.Id</dd>
+
+        <dt class="col-sm-2">Nombre</dt>
+        <dd class="col-sm-10">@Model.Nombre</dd>
+
+        <dt class="col-sm-2">Precio</dt>
+        <dd class="col-sm-10">@Model.Precio</dd>
+
+        <dt class="col-sm-2">Descripcion</dt>
+        <dd class="col-sm-10">@Model.Descripcion</dd>
+
+        <dt class="col-sm-2">Tipo de Producto</dt>
+        <dd class="col-sm-10">@Model.TipoProductoId</dd>
+
+        <dt class="col-sm-2">Público</dt>
+        <dd class="col-sm-10">@Model.TipoPublicoId</dd>
+
+        <dt class="col-sm-2">Talla</dt>
+        <dd class="col-sm-10">@Model.Talla</dd>
+    </dl>
+
+    <!-- Formulario de eliminación -->
+    <form asp-action="Delete" method="post">
+        @Html.AntiForgeryToken()
+
+        <!-- El Id se envía oculto para identificar el registro -->
+        <input type="hidden" asp-for="Id" />
+
+        <input type="submit" value="Delete" class="btn btn-danger" />
+        |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>

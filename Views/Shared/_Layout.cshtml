@@ -1,6 +1,7 @@
 @using Microsoft.AspNetCore.Http
 
 @{
+    // Datos de sesión del usuario actual
     var usuario = Context.Session.GetString("Usuario");
     var rol = Context.Session.GetString("Rol");
 }
@@ -11,16 +12,18 @@
     <title>@ViewData["Title"] - TiendaDeDisfraces</title>
     <link rel="stylesheet" href="~/css/css.css" />
 </head>
-
 <body>
     <div id="container">
 
+        <!-- Encabezado principal -->
         <div id="header">
             <div class="headtitle">Tienda de Disfraces</div>
         </div>
 
+        <!-- Barra de menú principal -->
         <div id="menu">
             <ul>
+                <!-- Menú izquierdo -->
                 <li><a asp-controller="Home" asp-action="Index">Home</a></li>
 
                 @if (rol == "Cajero" || rol == "ITAdmin" || rol == "Supervisor")
@@ -33,25 +36,41 @@
                     <li><a asp-controller="Producto" asp-action="Index">Productos</a></li>
                     <li><a asp-controller="Usuario" asp-action="Index">Usuarios</a></li>
                 }
-            </ul>
 
-            <div style="float:right;">
+                <!-- Menú derecho -->
+                <li class="menu-right-item cart-item">
+                    <a href="javascript:void(0);">
+                        🛒 <span class="cart-count">0</span>
+                    </a>
+                </li>
+
                 @if (string.IsNullOrEmpty(usuario))
                 {
-                    <a asp-controller="Usuario" asp-action="Login">Login</a>
+                    <li class="menu-right-item">
+                        <a asp-controller="Usuario" asp-action="Login">Login</a>
+                    </li>
                 }
                 else
                 {
-                    <span>@usuario</span>
-                    <a asp-controller="Usuario" asp-action="Logout">Logout</a>
+                    <li class="menu-right-item">
+                        <a asp-controller="Usuario" asp-action="Logout">Logout</a>
+                    </li>
+                    <li class="menu-right-item">
+                        <a href="javascript:void(0);">@usuario</a>
+                    </li>
                 }
-            </div>
+            </ul>
         </div>
 
+        <!-- Contenido dinámico -->
         <div id="content">
             @RenderBody()
         </div>
 
     </div>
+    
+    
+    @* Scripts globales del sistema *@
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

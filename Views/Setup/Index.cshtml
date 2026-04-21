@@ -15,10 +15,12 @@
 
     <div id="container">
 
+        <!-- Encabezado principal -->
         <div id="header">
             <div class="headtitle">Tienda de Disfraces</div>
         </div>
 
+        <!-- Contenido principal -->
         <div id="content">
             <div id="insidecontent">
 
@@ -29,24 +31,26 @@
                     Complete todos los campos requeridos.
                 </p>
 
+                <!-- Muestra errores del modelo -->
                 @Html.ValidationSummary()
 
+                <!-- Formulario de creación del primer usuario -->
                 <form asp-action="Index" method="post">
                     @Html.AntiForgeryToken()
 
                     <p>
                         <label>Nombre</label><br />
-                        <input asp-for="Nombre" />
+                        <input asp-for="Nombre" id="Nombre" />
                     </p>
 
                     <p>
                         <label>Cédula</label><br />
-                        <input asp-for="Cedula" />
+                        <input asp-for="Cedula" id="Cedula" />
                     </p>
 
                     <p>
                         <label>Teléfono</label><br />
-                        <input asp-for="Telefono" />
+                        <input asp-for="Telefono" id="Telefono" />
                     </p>
 
                     <p>
@@ -74,6 +78,47 @@
         </div>
 
     </div>
+
+    <!-- =========================================
+         VALIDACIÓN EN TIEMPO REAL (jQuery)
+         - Se ejecuta en cada tecla (evento input)
+         - Limpia datos inválidos automáticamente
+         - Mejora la experiencia del usuario
+         ========================================= -->
+    <!-- Librería jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+        // =========================================
+        // NOMBRE → Solo letras y espacios
+        // Elimina números y símbolos automáticamente
+        // =========================================
+        $("#Nombre").on("input", function () {
+        let clean = $(this).val().replace(/[^a-zA-Z\s]/g, "");
+        $(this).val(clean);
+        });
+
+        // =========================================
+        // CÉDULA → Solo números
+        // Elimina letras o caracteres inválidos
+        // =========================================
+        $("#Cedula").on("input", function () {
+        let clean = $(this).val().replace(/\D/g, "");
+        $(this).val(clean);
+        });
+
+        // =========================================
+        // TELÉFONO → Solo números (máx 8 dígitos)
+        // =========================================
+        $("#Telefono").on("input", function () {
+        let clean = $(this).val().replace(/\D/g, "").slice(0, 8);
+        $(this).val(clean);
+        });
+
+        });
+    </script>
 
 </body>
 </html>
