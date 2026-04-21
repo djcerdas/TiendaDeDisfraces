@@ -4,48 +4,136 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TiendaDeDisfraces.Models
 {
-    // Modelo que representa un usuario del sistema
+    /// <summary>
+    /// Modelo (Entidad) Usuario.
+    /// Esta clase representa la tabla Usuarios en la base de datos.
+    /// </summary>
     public class Usuario
     {
-        // Clave primaria
-        public int Id { get; set; }
+        // Atributos privados
+        private int _id;
+        private string _cedula;
+        private string _nombre;
+        private string _correo;
+        private string _telefono;
+        private string _username;
+        private string _password;
+        private string _rol;
+        private DateTime _fechaNacimiento;
+        private bool _preferencial;
 
-        // Cédula: solo números entre 9 y 12 dígitos
+        // Constructor sin parámetros (necesario para MVC/Entity)
+        public Usuario()
+        {
+            _id = 0;
+            _cedula = "";
+            _nombre = "";
+            _correo = "";
+            _telefono = "";
+            _username = "";
+            _password = "";
+            _rol = "";
+            _fechaNacimiento = DateTime.Today;
+            _preferencial = false;
+        }
+
+        // Constructor con parámetros
+        public Usuario(int id, string cedula, string nombre, string correo, string telefono,
+                       string username, string password, string rol, DateTime fechaNacimiento,
+                       bool preferencial)
+        {
+            _id = id;
+            _cedula = cedula;
+            _nombre = nombre;
+            _correo = correo;
+            _telefono = telefono;
+            _username = username;
+            _password = password;
+            _rol = rol;
+            _fechaNacimiento = fechaNacimiento;
+            _preferencial = preferencial;
+        }
+
+        // Propiedades públicas (Getters/Setters)
+
+        [Required]
+        public int Id
+        {
+            get { return _id; }
+            set { _id = value; }
+        }
+
         [Required(ErrorMessage = "Cédula requerida")]
         [RegularExpression(@"^\d{9,12}$", ErrorMessage = "Solo números (9-12 dígitos)")]
-        public string Cedula { get; set; }
+        [StringLength(12, ErrorMessage = "La cédula no puede superar 12 caracteres.")]
+        public string Cedula
+        {
+            get { return _cedula; }
+            set { _cedula = value; }
+        }
 
-        // Nombre: solo letras y espacios
         [Required(ErrorMessage = "Nombre requerido")]
-        [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Solo letras")]
-        public string Nombre { get; set; }
+        [RegularExpression(@"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$", ErrorMessage = "Solo letras y espacios")]
+        [StringLength(120, ErrorMessage = "El nombre no puede superar 120 caracteres.")]
+        public string Nombre
+        {
+            get { return _nombre; }
+            set { _nombre = value; }
+        }
 
-        // Correo electrónico válido
         [Required(ErrorMessage = "Correo requerido")]
         [EmailAddress(ErrorMessage = "Correo inválido")]
-        public string Correo { get; set; }
+        [StringLength(150, ErrorMessage = "El correo no puede superar 150 caracteres.")]
+        public string Correo
+        {
+            get { return _correo; }
+            set { _correo = value; }
+        }
 
-        // Teléfono: exactamente 8 dígitos
         [Required(ErrorMessage = "Teléfono requerido")]
         [RegularExpression(@"^\d{8}$", ErrorMessage = "Debe tener 8 dígitos")]
-        public string Telefono { get; set; }
+        [StringLength(8, ErrorMessage = "El teléfono no puede superar 8 caracteres.")]
+        public string Telefono
+        {
+            get { return _telefono; }
+            set { _telefono = value; }
+        }
 
-        // Usuario de acceso al sistema
         [Required(ErrorMessage = "Username requerido")]
-        public string Username { get; set; }
+        [StringLength(50, ErrorMessage = "El username no puede superar 50 caracteres.")]
+        public string Username
+        {
+            get { return _username; }
+            set { _username = value; }
+        }
 
-        // Contraseña del usuario
         [Required(ErrorMessage = "Password requerido")]
-        public string Password { get; set; }
+        [StringLength(255, ErrorMessage = "La contraseña no puede superar 255 caracteres.")]
+        public string Password
+        {
+            get { return _password; }
+            set { _password = value; }
+        }
 
-        // Rol dentro del sistema (Cliente, Cajero, ITAdmin, etc.)
-        public string Rol { get; set; }
+        [StringLength(50, ErrorMessage = "El rol no puede superar 50 caracteres.")]
+        public string Rol
+        {
+            get { return _rol; }
+            set { _rol = value; }
+        }
 
-        // Fecha de nacimiento del usuario
-        public DateTime FechaNacimiento { get; set; }
+        [DataType(DataType.Date)]
+        public DateTime FechaNacimiento
+        {
+            get { return _fechaNacimiento; }
+            set { _fechaNacimiento = value; }
+        }
 
-        // Indica si el usuario es preferencial
-        public bool Preferencial { get; set; }
+        public bool Preferencial
+        {
+            get { return _preferencial; }
+            set { _preferencial = value; }
+        }
 
         // Propiedad calculada: edad del usuario
         [NotMapped]
@@ -55,7 +143,12 @@ namespace TiendaDeDisfraces.Models
             {
                 var hoy = DateTime.Today;
                 var edad = hoy.Year - FechaNacimiento.Year;
-                if (FechaNacimiento.Date > hoy.AddYears(-edad)) edad--;
+
+                if (FechaNacimiento.Date > hoy.AddYears(-edad))
+                {
+                    edad--;
+                }
+
                 return edad;
             }
         }
